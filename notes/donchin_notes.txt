@@ -1,0 +1,9 @@
+according to Scottie's ebbinghaus/libet/notes/Donchin_notes/20120221_Donchin_RSVP_processing_notes.txt:
+	exg1:	HEOG (L, I think, see Libet lab book for 12aug12jt)
+	exg2:	HEOG (R, I think)
+	exg3:	VEOG (R supra, I think)
+	exg4:	VEOG (R sub, I think)
+	exg5:	mastoid (L, I think)
+	exg6:	mastoid (R, I think)
+	exg7:	doesn't say, but probably EMG R low
+	exg8:	doesn't say, but probably EMG R upp

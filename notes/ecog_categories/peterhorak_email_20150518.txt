@@ -1,0 +1,16 @@
+I copied the picture memory data for one subject to /home/tselab/projects/alex_mvpa on wundt. The 4 files correspond to the 4 picture memory sessions (encode 150 pictures, identify 100 pictures 20min later, identify 100 pictures the next day, identify 100 pictures the day afrter). The data is saved as a structure with the following fields:
+data - the ECoG data as a channel x sample x trial 3D array
+shape - indicates to what each dimension of the array corresponds
+channel - a cell array of the channel labels
+time - an array the times of each sample relative to stimulus onset (the pictures were presentecd for 3sec each)
+trial - a struct array with one element for each trial and the following fields
+     correct - a string indicating whether the subject identified the picture correctly or not (each encode event is given the label of the corresponding event in the later, recall sessions)
+     category - the category of the image presented
+     image - the name of the image presented
+     presentation - a string indicating whether this is the first or second time the image has been presented
+     session - a string indicating whether the event is from a encode or recall session ('recall' should really be replaced with 'identify' or 'recognize')
+fs - the sample frequency (I downsampled to 400Hz from 1600Hz)
+
+A few other notes: 1) When looking through the data I saw a number of major interictal spikes. I left the trials containing them in the dataset for now but wanted to warn you that they are there and need to be accounted for (probably removed). 2) This dataset was collected before we realized that the clinical system applies a 1-70Hz bandpass filter when we export data unless we explicitely specify otherwise. I tried re-exporting the data without the filter, but then had some trouble extracting events from the sync channel. What range of frequencies do you plan to analyze? If you need to look at frequencies above 70Hz I can continue to work on re-exporting the data. I just decided to send you what I had for now since the re-export was being a pain.
+
+Let me know if I've overlooked anything or you have questions about the data/experiment.
