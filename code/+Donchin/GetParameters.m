@@ -59,3 +59,6 @@ global strDirData
 	sSession		= load(cPathSession{1});
 	%trigger codes are screwed up in the BDF file
 	param.trigger	= structfun2(@(x) bin2dec(fliplr(dec2bin(x,16))),sSession.triggercode);
+	
+	param.trigger.timelock.all	= [param.trigger.imp_letter; param.trigger.err_keyearly];
+	param.trigger.timelock.good	= param.trigger.imp_letter;

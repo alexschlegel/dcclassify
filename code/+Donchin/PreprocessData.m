@@ -70,7 +70,7 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 		cfg.trialdef.poststim	= param.t.window.end;
 		
 		cfg.trialdef.eventtype	= 'STATUS';
-		cfg.trialdef.eventvalue	= param.trigger.imp_letter;
+		cfg.trialdef.eventvalue	= param.trigger.timelock.all;
 		
 		cfg.dataset	= strPathEEG;
 		
@@ -78,8 +78,12 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 		
 		cfg	= 	ft_definetrial(cfg);
 		
+		%keep only the good trials
+			bGood	= ismember(cfg.trl(:,4),param.trigger.timelock.good);
+			cfg.trl	= cfg.trial(bGood,:);
+		
 		%keep track of the trial type
-			cfg.trl	= [cfg.trl kCondition];
+			cfg.trl	= [cfg.trl kCondition(bGood)];
 		
 		%get rid of the prompt_cue_end and char_flip triggers!
 			bBlank						= cellfun(@isempty,{cfg.event.value});
