@@ -122,6 +122,9 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 	%downsample
 		%not yet
 	
+	%to manually check data:
+		%cfg	= ft_databrowser(cfg,data);
+	
 	%reject trials with supra-threshold amplitude
 		kChannelCheck	= find(ismember(data.label,param.channel.reject));
 		bTrialReject	= cellfun(@(d) any(reshape(abs(d(kChannelCheck,:)),[],1)>param.threshold.reject),data.trial);

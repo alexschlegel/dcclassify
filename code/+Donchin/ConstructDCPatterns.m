@@ -63,7 +63,9 @@ function DCPatternOne(strPathPP,strPathOut,param)
 	dc	= struct;
 	
 	%load the preprocessed data
+		status('loading preprocessed data');
 		data	= MATLoad(strPathPP,'data');
+		status('preprocessed data loaded!');
 	
 	%extract just the data we need
 		t			= data.time{1};

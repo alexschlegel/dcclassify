@@ -7,3 +7,6 @@ according to Scottie's ebbinghaus/libet/notes/Donchin_notes/20120221_Donchin_RSV
 	exg6:	mastoid (R, I think)
 	exg7:	doesn't say, but probably EMG R low
 	exg8:	doesn't say, but probably EMG R upp
+
+every one of cp's compute trials has some kind of movement artifact, so i'm just
+throwing her out
