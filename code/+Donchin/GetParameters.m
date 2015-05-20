@@ -55,7 +55,7 @@ global strDirData
 	warning('off','all');
 	
 	strDirDonchin	= DirAppend(strDirData,'donchin');
-	cPathSession	= FindFilesByExtension(strDirDonchin,'mat');
+	cPathSession	= FindFiles(strDirDonchin,'^\d{2}\w{3}\d{2}\w{2,3}\.mat$');
 	sSession		= load(cPathSession{1});
 	%trigger codes are screwed up in the BDF file
 	param.trigger	= structfun2(@(x) bin2dec(fliplr(dec2bin(x,16))),sSession.triggercode);
