@@ -80,7 +80,7 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 		
 		%keep only the good trials
 			bGood	= ismember(cfg.trl(:,4),param.trigger.timelock.good);
-			cfg.trl	= cfg.trial(bGood,:);
+			cfg.trl	= cfg.trl(bGood,:);
 		
 		%keep track of the trial type
 			cfg.trl	= [cfg.trl kCondition(bGood)];
