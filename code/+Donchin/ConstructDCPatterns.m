@@ -93,24 +93,24 @@ function DCPatternOne(strPathPP,strPathOut,param)
 	
 	%window start and lag info
 		tStart	= reshape(param.t.gcsignal.start.min:param.t.gcsignal.start.step:param.t.gcsignal.start.max,[],1);
-		tEnd	= tStart + param.t.gcsignal.duration;
 		nStart	= numel(tStart);
 	
 		tLag	= reshape(param.t.lag.min:param.t.lag.step:param.t.lag.max,[],1);
 		nLag	= numel(tLag);
 		
+		tStartRep	= repmat(tStart,[1 nLag]);
+		tLagRep		= repmat(reshape(tLag,1,[]),[nStart 1]);
+		
+		tEnd	= tStartRep + param.t.gcsignal.duration + tLagRep;
+		
 		%convert times to sample indices
 			kStart	= t2k(tStart,rate);
-			kEnd	= t2k(tEnd,rate) - 1;
 			kLag	= t2k(tLag,rate) - 1;
+			kEnd	= t2k(tEnd,rate) - 1;
 		
 		dc.param.t.start	= tStart;
-		dc.param.t.end		= tEnd;
 		dc.param.t.lag		= tLag;
-	
-	%classification directions
-		cDirection	= {'forward';'backward'};
-		nDirection	= numel(cDirection);
+		dc.param.t.end		= tEnd;
 	
 	%initialize the pattern arrays
 		dc.forward	= NaN(nPosterior,nAnterior,nTrial,nStart,nLag);
@@ -122,37 +122,19 @@ function DCPatternOne(strPathPP,strPathOut,param)
 		progress('action','init','name','start_time','total',nStart,'label','start times');
 		for kT=1:nStart
 			kStartCur	= kStart(kT);
-			kEndCur		= kEnd(kT);
 			
-			dP	= dPosterior(kStartCur:kEndCur,:,:);
-			dA	= dAnterior(kStartCur:kEndCur,:,:);
-			
-			for kD=1:nDirection
-				strDirection	= cDirection{kD};
+			for kL=1:nLag
+				kLagCur	= kLag(kL);
+				kEndCur	= kEnd(kT,kL);
 				
-				switch strDirection
-					case 'forward'
-						dSrc	= dP;
-						dDst	= dA;
-					case 'backward'
-						dSrc	= dA;
-						dDst	= dP;
-				end
-				
-				nSrc	= size(dSrc,3);
-				nDst	= size(dDst,3);
-				
-				for kL=1:nLag
-					kLagCur	= kLag(kL);
-					
-					for kSrc=1:nSrc
-						for kDst=1:nDst
-							for kR=1:nTrial
-								dSrcCur	= dSrc(:,kR,kSrc);
-								dDstCur	= dDst(:,kR,kDst);
-								
-								dc.(strDirection)(kSrc,kDst,kR,kT,kL)	= GrangerCausalityUni(dSrcCur,dDstCur,'lag',kLagCur);
-							end
+				for kR=1:nTrial
+					for kP=1:nPosterior
+						for kA=1:nAnterior
+							dP	= dPosterior(kStartCur:kEndCur,kR,kP);
+							dA	= dAnterior(kStartCur:kEndCur,kR,kA);
+							
+							dc.forward(kP,kA,kR,kT,kL)	= GrangerCausalityUni(dP,dA,'lag',kLagCur);
+							dc.backward(kA,kP,kR,kT,kL)	= GrangerCausalityUni(dA,dP,'lag',kLagCur);
 						end
 					end
 				end
