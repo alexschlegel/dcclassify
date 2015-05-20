@@ -19,7 +19,7 @@ function [trl,evt] = FTTrialFun(cfg,trigStart,trigEnd)
 	[trl,evt]	= ft_trialfun_general(cfg);
 
 %restrict to trials within the endpoints
-	kTrialStart	= min(find(trl(:,4)==trigStart));
-	kTrialEnd	= max(find(trl(:,4)==trigEnd));
+	kTrialStart	= find(trl(:,4)==trigStart,1,'last');
+	kTrialEnd	= find(trl(:,4)==trigEnd,1,'last');
 	
 	trl	= trl(kTrialStart+1:kTrialEnd-1,:);
