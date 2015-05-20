@@ -127,7 +127,6 @@ function DCPatternOne(strPathPP,strPathOut,param)
 			dP	= dPosterior(kStartCur:kEndCur,:,:);
 			dA	= dAnterior(kStartCur:kEndCur,:,:);
 			
-			progress('action','init','name','direction','total',nDirection,'label','directions');
 			for kD=1:nDirection
 				strDirection	= cDirection{kD};
 				
@@ -143,7 +142,6 @@ function DCPatternOne(strPathPP,strPathOut,param)
 				nSrc	= size(dSrc,3);
 				nDst	= size(dDst,3);
 				
-				progress('action','init','name','lag','total',nLag,'label','lags');
 				for kL=1:nLag
 					kLagCur	= kLag(kL);
 					
@@ -157,11 +155,7 @@ function DCPatternOne(strPathPP,strPathOut,param)
 							end
 						end
 					end
-					
-					progress('name','lag');
 				end
-				
-				progress('name','direction');
 			end
 			
 			progress('name','start_time');

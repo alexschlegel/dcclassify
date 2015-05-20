@@ -38,4 +38,7 @@ strExperiment	= 'donchin';
 				);
 
 %perform each classification
+	res = DCClassify(cPathDC,...
+			
+			);
 	
