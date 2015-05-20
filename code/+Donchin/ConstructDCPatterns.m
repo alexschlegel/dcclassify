@@ -7,7 +7,7 @@ function cPathOut = ConstructDCPatterns(cPathPP,varargin)
 % Syntax:	cPathOut = Donchin.ConstructDCPatterns(cPathPP,<options>)
 % 
 % In:
-%	cPathPP	- a cell of path to the preprocessed EEG data .mat files (see
+%	cPathPP	- a cell of paths to the preprocessed EEG data .mat files (see
 %			  Donchin.PreprocessData)
 %	<options>:
 %		output:	(<auto>) the output dc pattern file paths
@@ -40,7 +40,7 @@ function cPathOut = ConstructDCPatterns(cPathPP,varargin)
 			param	= opt.param;
 		end
 
-%determine which data need to be preprocessed
+%determine which data need to be processed
 	sz	= size(cPathPP);
 	
 	if opt.force
@@ -52,9 +52,9 @@ function cPathOut = ConstructDCPatterns(cPathPP,varargin)
 %preprocess
 	if any(bDo(:))
 		MultiTask(@DCPatternOne,{cPathPP(bDo) cPathOut(bDo) param},...
-			'description'	, 'constructing DC pattern'	, ...
-			'uniformoutput'	, true						, ...
-			'cores'			, opt.cores					  ...
+			'description'	, 'constructing DC patterns'	, ...
+			'uniformoutput'	, true							, ...
+			'cores'			, opt.cores						  ...
 			);
 	end
 

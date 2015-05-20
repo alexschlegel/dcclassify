@@ -25,7 +25,7 @@ global strDirData
 	param.t.gcsignal.start.step	= 0.1;	%start time step
 	param.t.gcsignal.duration	= 0.5;	%duration of the GC signals
 	
-	param.t.lag.min		= 0;	%minimum lag time for destination signal
+	param.t.lag.min		= 0.1;	%minimum lag time for destination signal
 	param.t.lag.max		= 0.5;	%maximum lag time
 	param.t.lag.step	= 0.1;	%lag time step
 	
