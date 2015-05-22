@@ -84,12 +84,13 @@ function [trl,evt] = FTTrialFunTask(cfg,param)
 		
 		%imperative stimulus should be close enough to the first prompt_cue_end
 		%trigger
-			kImp	= arrayfun(@(ks,ke) ks + find(trl(ks+1:ke-1,4)==param.trigger.prompt_cue_end,1,'first'),kTrialStart,kTrialEnd);
+			kImp	= arrayfun(@(ks,ke) unless(ks + find(trl(ks+1:ke-1,4)==param.trigger.prompt_cue_end,1,'first'),NaN),kTrialStart,kTrialEnd);
+			bGood	= ~isnan(kImp);
 		
 		%make sure we don't have any errors between the trial start and the
 		%prompt cue end
-			bGood	= arrayfun(@(ks,ki) ~any(trl(ks:ki,4)==param.trigger.err_keyearly),kTrialStart,kImp);
-			nBad	= nBad + sum(~bGood);
+			bGood(bGood)	= arrayfun(@(ks,ki) ~any(trl(ks:ki,4)==param.trigger.err_keyearly),kTrialStart(bGood),kImp(bGood));
+			nBad			= nBad + sum(~bGood);
 		
 		kKeep		= [kKeep; kImp(bGood)];
 		kCondition	= [kCondition; param.condition{kT}(bGood)];
