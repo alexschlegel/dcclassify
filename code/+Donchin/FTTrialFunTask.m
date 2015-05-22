@@ -84,7 +84,7 @@ function [trl,evt] = FTTrialFunTask(cfg,param)
 		
 		%imperative stimulus should be close enough to the first prompt_cue_end
 		%trigger
-			kImp	= arrayfun(@(ks,ke) ks + find(trl(k+1:ke-1,4)==param.trigger.prompt_cue_end,1,'first'),kTrialStart,kTrialEnd);
+			kImp	= arrayfun(@(ks,ke) ks + find(trl(ks+1:ke-1,4)==param.trigger.prompt_cue_end,1,'first'),kTrialStart,kTrialEnd);
 		
 		%make sure we don't have any errors between the trial start and the
 		%prompt cue end
