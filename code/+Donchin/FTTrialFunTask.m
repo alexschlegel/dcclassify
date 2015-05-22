@@ -30,10 +30,11 @@ function [trl,evt] = FTTrialFunTask(cfg,param)
 	
 	nTask	= numel(trigTaskStart);
 
-%find all relevant trials
+%find all relevant events
 	cfg.trialdef.eventvalue	=	[
 									trigTaskStart
 									param.trigger.trial_start
+									param.trigger.trial_end
 									param.trigger.err_keyearly
 									param.trigger.prompt_cue_end
 									trigTaskEnd
@@ -52,14 +53,25 @@ function [trl,evt] = FTTrialFunTask(cfg,param)
 			nTaskStart	= numel(kTaskStart);
 		
 		%find the good task block (it looks like e.g. sometimes a task was
-		%aborted and started over
+		%aborted and started over) and the start of each trial within that block
 			bTaskFound	= false;
 			for kS=1:nTaskStart
-				kTaskEnd	= kTaskStart(kS) + find(trl(kTaskStart(kS)+1:end,4)==trigTaskEnd(kT),1,'first');
+				%end of the task
+					kTaskEnd	= kTaskStart(kS) + find(trl(kTaskStart(kS)+1:end,4)==trigTaskEnd(kT),1,'first');
 				
-				kTrialStart	= kTaskStart(kS) + find(trl(kTaskStart(kS)+1:kTaskEnd-1,4)==param.trigger.trial_start);
+				%start of the trials within the task
+					kTrialStart	= kTaskStart(kS) + find(trl(kTaskStart(kS)+1:kTaskEnd-1,4)==param.trigger.trial_start);
+					nTrial		= numel(kTrialStart);
 				
-				if numel(kTrialStart)>=80
+				%find the end of the trials. if there is no end trial before the
+				%start of the next trial, throw that trial out
+					kTrialEnd	= arrayfun(@(ks1,ks2) unless(ks1 + find(trl(ks1+1:ks2-1,4)==param.trigger.trial_end),NaN),kTrialStart,[kTrialStart(2:end); kTaskEnd]);
+					bBadTrial	= isnan(kTrialEnd);
+					
+					kTrialStart(bBadTrial)	= [];
+					kTrialEnd(bBadTrial)	= [];
+				
+				if numel(kTrialStart)==80
 					bTaskFound	= true;
 					kTaskStart	= kTaskStart(kS);
 					break;
@@ -72,7 +84,7 @@ function [trl,evt] = FTTrialFunTask(cfg,param)
 		
 		%imperative stimulus should be close enough to the first prompt_cue_end
 		%trigger
-			kImp	= arrayfun(@(k) k + find(trl(k+1:kTaskEnd-1,4)==param.trigger.prompt_cue_end,1,'first'),kTrialStart);
+			kImp	= arrayfun(@(ks,ke) ks + find(trl(k+1:ke-1,4)==param.trigger.prompt_cue_end,1,'first'),kTrialStart,kTrialEnd);
 		
 		%make sure we don't have any errors between the trial start and the
 		%prompt cue end
