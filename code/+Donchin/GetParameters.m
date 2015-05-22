@@ -20,7 +20,7 @@ global strDirData
 	%t.window.start+t.gcsignal.start.max+param.t.lag.max+param.t.window.duration
 	%which should be <= t.window.end
 	
-	%compute classification
+	%task classification
 		param.task.t.window.start	= -1.5;	%start time of the trial windows, relative to imperative
 		param.task.t.window.end		= 1.5;	%end time of the trial windows
 		param.task.t.window.pad		= 8;	%padded window duration, for filtering (see http://www.fieldtriptoolbox.org/faq/what_kind_of_filters_can_i_apply_to_my_data)
@@ -30,11 +30,11 @@ global strDirData
 		param.task.t.gcsignal.start.step	= 0.1;	%start time step
 		param.task.t.gcsignal.duration		= 1;	%duration of the GC signals
 		
-		param.task.t.lag.min	= 0.1;	%minimum lag time for destination signal
-		param.task.t.lag.max	= 0.5;	%maximum lag time
-		param.task.t.lag.step	= 0.1;	%lag time step
+		param.task.t.lag.min	= 0.025;	%minimum lag time for destination signal
+		param.task.t.lag.max	= 0.5;		%maximum lag time
+		param.task.t.lag.step	= 0.025;	%lag time step
 	
-	%task classification
+	%compute classification
 		param.compute.t.window.start	= 0;	%start time of the trial windows, relative to imperative
 		param.compute.t.window.end		= 2;	%end time of the trial windows
 		param.compute.t.window.pad		= 6;	%padded window duration, for filtering (see http://www.fieldtriptoolbox.org/faq/what_kind_of_filters_can_i_apply_to_my_data)
