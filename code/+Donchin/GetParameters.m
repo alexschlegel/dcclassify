@@ -16,23 +16,37 @@ global strDirData
 	param.filter.hp		= 0.1;	%high pass filter lower bound
 	param.filter.order	= 3;	%default filter order (4) gives an error
 %time parameters, in sec
-	param.t.window.start	= 0;	%start time of the trial windows, relative to imperative
-	param.t.window.end		= 2;	%end time of the trial windows
-	param.t.window.pad		= 6;	%padded window duration, for filtering (see http://www.fieldtriptoolbox.org/faq/what_kind_of_filters_can_i_apply_to_my_data)
+	%maximum sample time point is
+	%t.window.start+t.gcsignal.start.max+param.t.lag.max+param.t.window.duration
+	%which should be <= t.window.end
 	
-	param.t.gcsignal.start.min	= 0;	%minimum start time of the source signal used for GC calculation, relative to window start
-	param.t.gcsignal.start.max	= 1;	%maximum start time
-	param.t.gcsignal.start.step	= 0.1;	%start time step
-	param.t.gcsignal.duration	= 0.5;	%duration of the GC signals
+	%compute classification
+		param.task.t.window.start	= -1.5;	%start time of the trial windows, relative to imperative
+		param.task.t.window.end		= 1.5;	%end time of the trial windows
+		param.task.t.window.pad		= 8;	%padded window duration, for filtering (see http://www.fieldtriptoolbox.org/faq/what_kind_of_filters_can_i_apply_to_my_data)
+		
+		param.task.t.gcsignal.start.min		= 0;	%minimum start time of the source signal used for GC calculation, relative to window start
+		param.task.t.gcsignal.start.max		= 1.5;	%maximum start time
+		param.task.t.gcsignal.start.step	= 0.1;	%start time step
+		param.task.t.gcsignal.duration		= 1;	%duration of the GC signals
+		
+		param.task.t.lag.min	= 0.1;	%minimum lag time for destination signal
+		param.task.t.lag.max	= 0.5;	%maximum lag time
+		param.task.t.lag.step	= 0.1;	%lag time step
 	
-	param.t.lag.min		= 0.1;	%minimum lag time for destination signal
-	param.t.lag.max		= 0.5;	%maximum lag time
-	param.t.lag.step	= 0.1;	%lag time step
-	
-	%minimum sample time point is t.window.start+t.gcsignal.start.min
-	%maximum sample time point is t.window.start+t.gcsignal.start.max+param.t.lag.max+param.t.window.duration
-	%	which should be <= t.window.end
-	%	currently 0+1+0.5+0.5
+	%task classification
+		param.compute.t.window.start	= 0;	%start time of the trial windows, relative to imperative
+		param.compute.t.window.end		= 2;	%end time of the trial windows
+		param.compute.t.window.pad		= 6;	%padded window duration, for filtering (see http://www.fieldtriptoolbox.org/faq/what_kind_of_filters_can_i_apply_to_my_data)
+		
+		param.compute.t.gcsignal.start.min	= 0;	%minimum start time of the source signal used for GC calculation, relative to window start
+		param.compute.t.gcsignal.start.max	= 1;	%maximum start time
+		param.compute.t.gcsignal.start.step	= 0.1;	%start time step
+		param.compute.t.gcsignal.duration	= 0.5;	%duration of the GC signals
+		
+		param.compute.t.lag.min		= 0.1;	%minimum lag time for destination signal
+		param.compute.t.lag.max		= 0.5;	%maximum lag time
+		param.compute.t.lag.step	= 0.1;	%lag time step
 %trial rejection threshold, in uV
 	param.threshold.reject	= 80;
 %electrodes of interest
@@ -59,6 +73,3 @@ global strDirData
 	sSession		= load(cPathSession{1});
 	%trigger codes are screwed up in the BDF file
 	param.trigger	= structfun2(@(x) bin2dec(fliplr(dec2bin(x,16))),sSession.triggercode);
-	
-	param.trigger.timelock.all	= [param.trigger.imp_letter; param.trigger.err_keyearly];
-	param.trigger.timelock.good	= param.trigger.imp_letter;

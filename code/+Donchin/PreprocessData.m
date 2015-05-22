@@ -8,28 +8,35 @@ function cPathOut = PreprocessData(cPathEEG,varargin)
 % In:
 %	cPathEEG	- a cell of paths to the input EEG data
 %	<options>:
+%		type:	(<required>) the classification type:
+%					'compute':	for compute +/- classification
+%					'all':		for classification between all 4 tasks during
+%								preparatory period
 %		output:	(<auto>) the output preprocessed data file paths
 %		param:	(<load>) the donchin parameters from Donchin.GetParameters
 %		cores:	(1) the number of cores to use
 %		force:	(true) true to force preprocessing
 % 
-% Updated: 2015-05-19
+% Updated: 2015-05-21
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
 
 %parse the inputs
 	opt	= ParseArgs(varargin,...
-			'output'	, []	, ...
-			'param'		, []	, ...
-			'cores'		, 1		, ...
-			'force'		, true	  ...
+			'type'		, ''	, ...
+			'output'	, []		, ...
+			'param'		, []		, ...
+			'cores'		, 1			, ...
+			'force'		, true		  ...
 			);
+	
+	opt.type	= CheckInput(opt.type,'type',{'compute','task'});
 	
 	[cPathEEG,cPathOut]	= ForceCell(cPathEEG,opt.output);
 	[cPathEEG,cPathOut]	= FillSingletonArrays(cPathEEG,cPathOut);
 	
-	cPathOut	= cellfun(@(fi,fo) unless(fo,PathAddSuffix(fi,'-pp','mat')),cPathEEG,cPathOut,'uni',false);
+	cPathOut	= cellfun(@(fi,fo) unless(fo,PathAddSuffix(fi,sprintf('-pp_%s',opt.type),'mat')),cPathEEG,cPathOut,'uni',false);
 	
 	%parameters
 		if isempty(opt.param)
@@ -37,6 +44,8 @@ function cPathOut = PreprocessData(cPathEEG,varargin)
 		else
 			param	= opt.param;
 		end
+		
+		param.type	= opt.type;
 
 %determine which data need to be preprocessed
 	sz	= size(cPathEEG);
@@ -58,32 +67,41 @@ function cPathOut = PreprocessData(cPathEEG,varargin)
 
 %------------------------------------------------------------------------------%
 function PreprocessOne(strPathEEG,strPathOut,param)
-	%load the session info
+	%get the condition info
 		strPathMAT	= PathAddSuffix(strPathEEG,'','mat');
 		sSession	= load(strPathMAT);
-		kCondition	= sSession.trial.compute.isGreen + 1; %1==red, 2==green
+		
+		switch param.type
+			case 'compute'
+				kCondition	= sSession.trial.compute.isGreen + 1; %1==red, 2==green
+			case 'task'
+				cTask	= {'both';'select';'predict';'compute'};
+				nTask	= numel(cTask);
+				nTrial	= cellfun(@(t) numel(sSession.trial.(t).tPrompt),cTask);
+				
+				kCondition	= arrayfun(@(t,n) repmat(t,[n 1]),(1:nTask)',nTrial,'uni',false);
+		end
 		
 	%define the compute trials
 		cfg	= struct;
 		
-		cfg.trialdef.prestim	= param.t.window.start;
-		cfg.trialdef.poststim	= param.t.window.end;
+		cfg.trialdef.prestim	= -param.(param.type).t.window.start;
+		cfg.trialdef.poststim	= param.(param.type).t.window.end;
 		
 		cfg.trialdef.eventtype	= 'STATUS';
-		cfg.trialdef.eventvalue	= param.trigger.timelock.all;
 		
 		cfg.dataset	= strPathEEG;
 		
-		cfg.trialfun = @(cfg) Donchin.FTTrialFun(cfg,param.trigger.compute_start,param.trigger.compute_end);
+		param.condition	= kCondition;
+		
+		switch param.type
+			case 'compute'
+				cfg.trialfun = @(cfg) Donchin.FTTrialFunCompute(cfg,param);
+			case 'task'
+				cfg.trialfun = @(cfg) Donchin.FTTrialFunTask(cfg,param);
+		end
 		
 		cfg	= 	ft_definetrial(cfg);
-		
-		%keep only the good trials
-			bGood	= ismember(cfg.trl(:,4),param.trigger.timelock.good);
-			cfg.trl	= cfg.trl(bGood,:);
-		
-		%keep track of the trial type
-			cfg.trl	= [cfg.trl kCondition(bGood)];
 		
 		%get rid of the prompt_cue_end and char_flip triggers!
 			bBlank						= cellfun(@isempty,{cfg.event.value});
@@ -96,7 +114,7 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 	%preprocess the data
 		%padding for filtering operations (to mitigate edge effects)
 		%fieldtrip oddly defines 'padding' here as the total padded duration of a trial
-			cfg.padding	= param.t.window.pad;
+			cfg.padding	= param.(param.type).t.window.pad;
 			cfg.padtype	= 'data';
 		
 		%filtering

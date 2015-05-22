@@ -10,5 +10,3 @@ according to Scottie's ebbinghaus/libet/notes/Donchin_notes/20120221_Donchin_RSV
 
 every one of cp's compute trials has some kind of movement artifact, so i'm just
 throwing her out
-
-reject ec because it looks like he blinked immediately after every trial

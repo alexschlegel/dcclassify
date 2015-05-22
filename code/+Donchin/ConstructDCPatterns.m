@@ -10,18 +10,23 @@ function cPathOut = ConstructDCPatterns(cPathPP,varargin)
 %	cPathPP	- a cell of paths to the preprocessed EEG data .mat files (see
 %			  Donchin.PreprocessData)
 %	<options>:
+%		type:	(<required>) the classification type:
+%					'compute':	for compute +/- classification
+%					'all':		for classification between all 4 tasks during
+%								preparatory period
 %		output:	(<auto>) the output dc pattern file paths
 %		param:	(<load>) the donchin parameters from Donchin.GetParameters
 %		cores:	(1) the number of cores to use
 %		force:	(true) true to force pattern construction
 % 
-% Updated: 2015-05-19
+% Updated: 2015-05-21
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
 
 %parse the inputs
 	opt	= ParseArgs(varargin,...
+			'type'		, ''	, ...
 			'output'	, []	, ...
 			'param'		, []	, ...
 			'cores'		, 1		, ...
@@ -39,6 +44,8 @@ function cPathOut = ConstructDCPatterns(cPathPP,varargin)
 		else
 			param	= opt.param;
 		end
+		
+		param.type	= opt.type;
 
 %determine which data need to be processed
 	sz	= size(cPathPP);
@@ -87,21 +94,23 @@ function DCPatternOne(strPathPP,strPathOut,param)
 		nAnterior	= size(dAnterior,3);
 		
 		clear data;
-		
-	%number of trials
+	
+	%number of samples and trials
 		nTrial	= numel(dc.label);
 	
 	%window start and lag info
-		tStart	= reshape(param.t.gcsignal.start.min:param.t.gcsignal.start.step:param.t.gcsignal.start.max,[],1);
+		t	= param.(param.type).t;
+		
+		tStart	= reshape(t.gcsignal.start.min:t.gcsignal.start.step:t.gcsignal.start.max,[],1);
 		nStart	= numel(tStart);
 	
-		tLag	= reshape(param.t.lag.min:param.t.lag.step:param.t.lag.max,[],1);
+		tLag	= reshape(t.lag.min:t.lag.step:t.lag.max,[],1);
 		nLag	= numel(tLag);
 		
 		tStartRep	= repmat(tStart,[1 nLag]);
 		tLagRep		= repmat(reshape(tLag,1,[]),[nStart 1]);
 		
-		tEnd	= tStartRep + param.t.gcsignal.duration + tLagRep;
+		tEnd	= tStartRep + t.gcsignal.duration + tLagRep;
 		
 		%convert times to sample indices
 			kStart	= t2k(tStart,rate);
@@ -127,11 +136,27 @@ function DCPatternOne(strPathPP,strPathOut,param)
 				kLagCur	= kLag(kL);
 				kEndCur	= kEnd(kT,kL);
 				
+				%extract the windows of interest
+					dPWin	= dPosterior(kStartCur:kEndCur,:,:);
+					dAWin	= dAnterior(kStartCur:kEndCur,:,:);
+					
+					nTWin	= kEndCur - kStartCur + 1;
+				
+				%PCA-transform the data
+					dPWin	= reshape(dPWin,nTWin*nTrial,nPosterior);
+					dAWin	= reshape(dAWin,nTWin*nTrial,nAnterior);
+					
+					[~,dPWin]	= pca(dPWin);
+					[~,dAWin]	= pca(dAWin);
+					
+					dPWin	= reshape(dPWin,nTWin,nTrial,nPosterior);
+					dAWin	= reshape(dAWin,nTWin,nTrial,nPosterior);
+				
 				for kR=1:nTrial
 					for kP=1:nPosterior
 						for kA=1:nAnterior
-							dP	= dPosterior(kStartCur:kEndCur,kR,kP);
-							dA	= dAnterior(kStartCur:kEndCur,kR,kA);
+							dP	= dPWin(:,kR,kP);
+							dA	= dAWin(:,kR,kA);
 							
 							dc.forward(kP,kA,kR,kT,kL)	= GrangerCausalityUni(dP,dA,'lag',kLagCur);
 							dc.backward(kA,kP,kR,kT,kL)	= GrangerCausalityUni(dA,dP,'lag',kLagCur);
