@@ -65,7 +65,7 @@ function [trl,evt] = FTTrialFunTask(cfg,param)
 				
 				%find the end of the trials. if there is no end trial before the
 				%start of the next trial, throw that trial out
-					kTrialEnd	= arrayfun(@(ks1,ks2) unless(ks1 + find(trl(ks1+1:ks2-1,4)==param.trigger.trial_end),NaN),kTrialStart,[kTrialStart(2:end); kTaskEnd]);
+					kTrialEnd	= arrayfun(@(ks1,ks2) unless(ks1 + find(trl(ks1+1:ks2-1,4)==param.trigger.trial_end,1,'last'),NaN),kTrialStart,[kTrialStart(2:end); kTaskEnd]);
 					bBadTrial	= isnan(kTrialEnd);
 					
 					kTrialStart(bBadTrial)	= [];
