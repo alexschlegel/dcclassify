@@ -10,14 +10,16 @@ function cPathOut = PreprocessData(cPathEEG,varargin)
 %	<options>:
 %		type:	(<required>) the classification type:
 %					'compute':	for compute +/- classification
-%					'all':		for classification between all 4 tasks during
+%					'task':		for classification between all 4 tasks during
 %								preparatory period
+%					'task2':	for classification between all 4 tasks during
+%								preparatory period, with expanded window
 %		output:	(<auto>) the output preprocessed data file paths
 %		param:	(<load>) the donchin parameters from Donchin.GetParameters
 %		cores:	(1) the number of cores to use
 %		force:	(true) true to force preprocessing
 % 
-% Updated: 2015-05-21
+% Updated: 2015-06-03
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -74,7 +76,7 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 		switch param.type
 			case 'compute'
 				kCondition	= sSession.trial.compute.isGreen + 1; %1==red, 2==green
-			case 'task'
+			case {'task','task2'}
 				cTask	= {'both';'select';'predict';'compute'};
 				nTask	= numel(cTask);
 				nTrial	= cellfun(@(t) numel(sSession.trial.(t).tPrompt),cTask);
@@ -82,7 +84,7 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 				kCondition	= arrayfun(@(t,n) repmat(t,[n 1]),(1:nTask)',nTrial,'uni',false);
 		end
 		
-	%define the compute trials
+	%define the trials
 		cfg	= struct;
 		
 		cfg.trialdef.prestim	= -param.(param.type).t.window.start;
@@ -97,7 +99,7 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 		switch param.type
 			case 'compute'
 				cfg.trialfun = @(cfg) Donchin.FTTrialFunCompute(cfg,param);
-			case 'task'
+			case {'task','task2'}
 				cfg.trialfun = @(cfg) Donchin.FTTrialFunTask(cfg,param);
 		end
 		
