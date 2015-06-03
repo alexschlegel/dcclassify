@@ -31,7 +31,7 @@ function cPathOut = PreprocessData(cPathEEG,varargin)
 			'force'		, true		  ...
 			);
 	
-	opt.type	= CheckInput(opt.type,'type',{'compute','task'});
+	opt.type	= CheckInput(opt.type,'type',{'compute','task','task2'});
 	
 	[cPathEEG,cPathOut]	= ForceCell(cPathEEG,opt.output);
 	[cPathEEG,cPathOut]	= FillSingletonArrays(cPathEEG,cPathOut);
