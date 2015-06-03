@@ -18,7 +18,7 @@ function res = DCClassify(cPathDC,varargin)
 %		cores:	(1) the number of cores to use
 %		force:	(true) true to force dc classification
 % 
-% Updated: 2015-05-21
+% Updated: 2015-06-02
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -64,6 +64,10 @@ function res= DCClassifyOne(strPathDC)
 	
 	data	= load(strPathDC);
 	
+	%copy over some info
+		res.param	= data.param;
+		
+	
 	cDirection	= {'forward';'backward'};
 	nDirection	= numel(cDirection);
 	
@@ -99,7 +103,19 @@ function res= DCClassifyOne(strPathDC)
 			end
 		end
 		
+		resFirst	= res.(strDirection){1};
+		
 		res.(strDirection)	= restruct(cell2mat(res.(strDirection)));
+		
+		%eliminate some redundancy
+			cSame	= {'target','uniquetargets','chunk','uniquechunks','samples','features'};
+			nSame	= numel(cSame);
+			
+			for kS=1:nSame
+				strField	= cSame{kS};
+				
+				res.(strDirection).(strField)	= resFirst.(strField);
+			end
 	end
 %------------------------------------------------------------------------------%
 function res = GroupStats(res)
@@ -108,7 +124,9 @@ function res = GroupStats(res)
 	res.gmean	= nanmean(acc,3);
 	res.gse		= nanstderr(acc,[],3);
 	
-	[h,p,ci,stats]	= ttest(acc,0.5,...
+	nTarget	= numel(res.uniquetargets{1});
+	
+	[h,p,ci,stats]	= ttest(acc,1/nTarget,...
 						'dim'	, 3			, ...
 						'tail'	, 'right'	  ...
 						);
