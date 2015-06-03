@@ -12,14 +12,16 @@ function cPathOut = ConstructDCPatterns(cPathPP,varargin)
 %	<options>:
 %		type:	(<required>) the classification type:
 %					'compute':	for compute +/- classification
-%					'all':		for classification between all 4 tasks during
+%					'task':		for classification between all 4 tasks during
 %								preparatory period
+%					'task2':	for classification between all 4 tasks during
+%								preparatory period, with expanded window
 %		output:	(<auto>) the output dc pattern file paths
 %		param:	(<load>) the donchin parameters from Donchin.GetParameters
 %		cores:	(1) the number of cores to use
 %		force:	(true) true to force pattern construction
 % 
-% Updated: 2015-05-21
+% Updated: 2015-06-03
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.

@@ -12,13 +12,15 @@ function res = DCClassify(cPathDC,varargin)
 %	<options>:
 %		type:	(<required>) the classification type:
 %					'compute':	for compute +/- classification
-%					'all':		for classification between all 4 tasks during
+%					'task':		for classification between all 4 tasks during
 %								preparatory period
+%					'task2':	for classification between all 4 tasks during
+%								preparatory period, with expanded window
 %		output:	(<auto>) the output result file path. overrides <suffix>
 %		cores:	(1) the number of cores to use
 %		force:	(true) true to force dc classification
 % 
-% Updated: 2015-06-02
+% Updated: 2015-06-03
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -74,7 +76,16 @@ function res= DCClassifyOne(strPathDC)
 	[nSrc,nDst,nTrial,nStart,nLag]	= size(data.(cDirection{1}));
 	
 	kTarget	= data.label;
-	kChunk	= reshape(1:nTrial,size(kTarget));
+	%new chunking scheme (2015-06-03)
+		kChunk	= zeros(size(kTarget));
+		
+		kTargetU	= unique(kTarget);
+		nTarget		= numel(kTargetU);
+		
+		for kT=1:nTarget
+			kSampleTarget			= find(kTarget==kTargetU(kT));
+			kChunk(kSampleTarget)	= 1:numel(kSampleTarget);
+		end
 	
 	for kD=1:nDirection
 		strDirection	= cDirection{kD};
