@@ -145,6 +145,19 @@ function PreprocessOne(strPathEEG,strPathOut,param)
 	%to manually check data:
 		%cfg	= ft_databrowser(cfg,data);
 	
+	%ica
+% 		cfg			= [];
+% 		cfg.method	= 'runica';
+% 		comp		= ft_componentanalysis(cfg,data);
+		
+% 		cfg = []; cfg.component=1:24; cfg.layout = 'biosemi32.lay'; cfg.comment='no';
+% 		ft_topoplotIC(cfg, comp);
+%
+%		%OR
+		
+% 		cfg = []; cfg.channel=1:24; cfg.viewmode='component'; cfg.layout = 'biosemi32.lay';
+% 		ft_databrowser(cfg, comp);
+	
 	%reject trials with supra-threshold amplitude
 		kChannelCheck	= find(ismember(data.label,param.channel.reject));
 		bTrialReject	= cellfun(@(d) any(reshape(abs(d(kChannelCheck,:)),[],1)>param.threshold.reject),data.trial);
