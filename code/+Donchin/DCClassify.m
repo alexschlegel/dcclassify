@@ -1,4 +1,4 @@
-function DCClassify(cPathDC,varargin)
+function res = DCClassify(cPathDC,varargin)
 % Donchin.DCClassify
 % 
 % Description:	perform classification on the DC patterns constructed by
