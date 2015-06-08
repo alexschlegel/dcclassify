@@ -94,7 +94,7 @@ function sDC = ConstructDCPatterns(sPP,varargin)
 		sDC.dim	= {'src';'dst';'trial';'start_time';'lag'};
 	
 	%construct the pattern for each window and lag
-		[b,~,pool]	= MATLABPoolOpen(opt.cores,'ntask',nStart)
+		[b,~,pool]	= MATLABPoolOpen(opt.cores,'ntask',nStart);
 		if ~b
 			error('could not open matlab pool');
 		end
@@ -146,7 +146,7 @@ function sDC = ConstructDCPatterns(sPP,varargin)
 			end
 		end
 		
-		delete(strPathTemp);
+		delete(strPathCounter);
 		
 		MATLABPoolClose(pool);
 	
