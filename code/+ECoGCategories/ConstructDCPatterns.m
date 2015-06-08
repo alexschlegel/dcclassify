@@ -105,6 +105,10 @@ function sDC = ConstructDCPatterns(sPP,varargin)
 		fput('0',strPathCounter);
 		
 		parfor kT=1:nStart
+			if kT<=opt.cores
+				pause(kT/4);
+			end
+			
 			kkT	= str2double(fget(strPathCounter)) + 1;
 			fput(num2str(kkT),strPathCounter);
 			
