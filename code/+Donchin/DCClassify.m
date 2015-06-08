@@ -71,9 +71,9 @@ function res= DCClassifyOne(strPathDC,param)
 	global strDirAnalysis;
 	
 	strSession	= PathGetSession(strPathDC);
-	strPathOut	= PathUnsplit(strDirAnalysis,sprintf('%s-%s',strSession,param.type),'mat');
+	strPathOut	= PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('%s-%s',strSession,param.type),'mat');
 	
-	if ~opt.force_pre && FileExists(strPathOut)
+	if ~param.force_pre && FileExists(strPathOut)
 		res	= MATLoad(strPathOut,'res');
 		return;
 	end
@@ -145,13 +145,13 @@ function res= DCClassifyOne(strPathDC,param)
 		for kD=1:nDirection
 			strDirection	= cDirection{kD};
 			
-			res.(strDirection)	= cRes{:,:,kD};
+			res.(strDirection)	= cRes(:,:,kD);
 			
 			resFirst	= res.(strDirection){1};
 			
 			res.(strDirection)	= restruct(cell2mat(res.(strDirection)));
 			
-			cSame	= {'target','uniquetargets','chunk','uniquechunks','samples','features'};
+			cSame	= {'target','uniquetargets','chunk','uniquechunks','num_sample','num_feature'};
 			nSame	= numel(cSame);
 			
 			for kS=1:nSame
