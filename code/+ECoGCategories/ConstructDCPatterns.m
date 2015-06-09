@@ -16,6 +16,7 @@ function sDC = ConstructDCPatterns(sPP,varargin)
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
+global strDirData;
 
 %parse the inputs
 	opt	= ParseArgs(varargin,...
@@ -23,7 +24,9 @@ function sDC = ConstructDCPatterns(sPP,varargin)
 			'force'		, true	  ...
 			);
 	
-	strPathDC	= PathUnsplit(sPP.param.dir_data,sprintf('%s-dc',sPP.param.id),'mat');
+	strDirDC	= DirAppend(strDirData,DirSub(sPP.param.dir_data,-1,0));
+	
+	strPathDC	= PathUnsplit(strDirDC,sprintf('%s-dc',sPP.param.id),'mat');
 
 %do we need to construct the DC patterns?
 	if ~opt.force && FileExists(strPathDC)
