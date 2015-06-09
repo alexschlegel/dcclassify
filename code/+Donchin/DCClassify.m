@@ -58,7 +58,12 @@ global strDirAnalysis
 		res	= restruct(res);
 		
 		%do some stats
-			res	= structfun2(@GroupStats,res);
+			cFieldStat	= setdiff(fieldnames(res),'param');
+			nFieldStat	= numel(cFieldStat);
+			
+			for kF=1:nFieldStat
+				res.(cFieldStat{kF})	= GroupStats(res.(cFieldStat{kF}));
+			end
 		
 		%save the results
 			save(strPathOut,'-struct','res');
