@@ -96,16 +96,15 @@ function res= ElectrodeClassifyOne(strPathEP,param)
 	[nFeature,nTrial,nStart]	= size(data.(cType{1}));
 	
 	kTarget	= data.label;
-	%new chunking scheme (2015-06-03)
-		kChunk	= zeros(size(kTarget));
-		
-		kTargetU	= unique(kTarget);
-		nTarget		= numel(kTargetU);
-		
-		for kT=1:nTarget
-			kSampleTarget			= find(kTarget==kTargetU(kT));
-			kChunk(kSampleTarget)	= 1:numel(kSampleTarget);
-		end
+	kChunk	= zeros(size(kTarget));
+	
+	kTargetU	= unique(kTarget);
+	nTarget		= numel(kTargetU);
+	
+	for kT=1:nTarget
+		kSampleTarget			= find(kTarget==kTargetU(kT));
+		kChunk(kSampleTarget)	= 1:numel(kSampleTarget);
+	end
 	
 	%start the pool
 		[b,~,pool]	= MATLABPoolOpen(param.cores);
@@ -113,7 +112,7 @@ function res= ElectrodeClassifyOne(strPathEP,param)
 		assert(b,'could not open pool');
 	
 	%initialize some variables
-		cRes	= cell(nStart,nLag,nDirection);
+		cRes	= cell(nStart,nType);
 		nTask	= numel(cRes);
 	
 	tStart	= nowms;
@@ -121,16 +120,16 @@ function res= ElectrodeClassifyOne(strPathEP,param)
 	parfor kT=1:nTask
 		kkT	= filecounter(h);
 		
-		[kS,kL,kD]	= ind2sub([nStart nLag nDirection],kT);
+		[kS,kP]	= ind2sub([nStart nType],kT);
 		
-		strDirection	= cDirection{kD};
+		strType	= cType{kP};
 		
-		dCur	= reshape(data.(strDirection)(:,:,:,kS,kL),nSrc*nDst,nTrial);
+		dCur	= data.(strType)(:,:,kS);
 		
 		%make nSample x nFeature
 			dCur	= permute(dCur,[2 1]);
 		
-		strName	= sprintf('%s/kS=%d/kL=%d',PathGetFilePre(strPathDC),kS,kL);
+		strName	= sprintf('%s/kS=%d',PathGetFilePre(strPathEP),kS);
 		
 		cRes{kT}	= MVPA.CrossValidation(dCur,kTarget,kChunk,...
 						'name'				, strName	, ...
@@ -142,19 +141,19 @@ function res= ElectrodeClassifyOne(strPathEP,param)
 						'silent'			, true		  ...
 						);
 		
-		status(sprintf('%s | task %04d/%d | start %02d/%d | lag %02d/%d | %s | %s remaining',strSession,kkT,nTask,kS,nStart,kL,nLag,strDirection,etd(kkT/nTask,tStart)),0);
+		status(sprintf('%s | task %03d/%d | start %02d/%d | %s | %s remaining',strSession,kkT,nTask,kS,nStart,strType,etd(kkT/nTask,tStart)),0);
 	end
 	filecounter(h,'action','stop');
 	
 	%transfer to the struct and eliminate some redundancy
-		for kD=1:nDirection
-			strDirection	= cDirection{kD};
+		for kP=1:nType
+			strType	= cType{kP};
 			
-			res.(strDirection)	= cRes(:,:,kD);
+			res.(strType)	= cRes(:,kP);
 			
-			resFirst	= res.(strDirection){1};
+			resFirst	= res.(strType){1};
 			
-			res.(strDirection)	= restruct(cell2mat(res.(strDirection)));
+			res.(strType)	= restruct(cell2mat(res.(strType)));
 			
 			cSame	= {'target','uniquetargets','chunk','uniquechunks','num_sample','num_feature'};
 			nSame	= numel(cSame);
@@ -162,7 +161,7 @@ function res= ElectrodeClassifyOne(strPathEP,param)
 			for kS=1:nSame
 				strField	= cSame{kS};
 				
-				res.(strDirection).(strField)	= resFirst.(strField);
+				res.(strType).(strField)	= resFirst.(strField);
 			end
 		end
 	
