@@ -1,14 +1,14 @@
-function res = DCClassify(cPathDC,varargin)
+function res = ElectrodeClassify(cPathEP,varargin)
 % Donchin.DCClassify
 % 
-% Description:	perform classification on the DC patterns constructed by
-%				Donchin.ConstructDCPatterns
+% Description:	perform classification on the electrode patterns constructed by
+%				Donchin.ConstructElectrodePatterns
 % 
-% Syntax:	res = Donchin.DCClassify(cPathDC,<options>)
+% Syntax:	res = Donchin.ElectrodeClassify(cPathEP,<options>)
 % 
 % In:
-%	cPathDC	- a cell of paths to the DC patterns construct by
-%			  Donchin.ConstructDCPatterns
+%	cPathEP	- a cell of paths to the electrode patterns construct by
+%			  Donchin.ConstructElectrodePatterns
 %	<options>:
 %		type:		(<required>) the classification type:
 %						'compute':	for compute +/- classification
@@ -19,11 +19,11 @@ function res = DCClassify(cPathDC,varargin)
 %									window
 %		output:		(<auto>) the output result file path. overrides <suffix>
 %		cores:		(1) the number of cores to use
-%		force:		(true) true to force dc classification
+%		force:		(true) true to force classification
 %		force_pre:	(<force>) true to force the individual subject
 %					cross-validations
 % 
-% Updated: 2015-06-08
+% Updated: 2015-06-10
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -40,7 +40,7 @@ global strDirAnalysis
 	
 	opt.force_pre	= unless(opt.force_pre,opt.force);
 	
-	strPathOut	= unless(opt.output,PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('dcclassify_%s',opt.type),'mat'));
+	strPathOut	= unless(opt.output,PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('electrodeclassify_%s',opt.type),'mat'));
 	CreateDirPath(PathGetDir(strPathOut));
 
 %do we need to perform the analysis?
@@ -51,8 +51,8 @@ global strDirAnalysis
 		param	= rmfield(opt,{'output','force','isoptstruct','opt_extra'});
 		
 		%do each subject's classification
-			res	= cellfunprogress(@(f) DCClassifyOne(f,param),cPathDC,...
-					'label'	, 'performing DC classification'	 ...
+			res	= cellfunprogress(@(f) ElectrodeClassifyOne(f,param),cPathDC,...
+					'label'	, 'performing Electrode classification'	 ...
 					);
 			
 		res	= restruct(res);
@@ -72,11 +72,11 @@ global strDirAnalysis
 	end
 
 %------------------------------------------------------------------------------%
-function res= DCClassifyOne(strPathDC,param)
+function res= ElectrodeClassifyOne(strPathEP,param)
 	global strDirAnalysis;
 	
-	strSession	= PathGetSession(strPathDC);
-	strPathOut	= PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('%s-%s',strSession,param.type),'mat');
+	strSession	= PathGetSession(strPathEP);
+	strPathOut	= PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('electrodeclassify-%s-%s',strSession,param.type),'mat');
 	
 	if ~param.force_pre && FileExists(strPathOut)
 		res	= MATLoad(strPathOut,'res');
@@ -85,15 +85,15 @@ function res= DCClassifyOne(strPathDC,param)
 	
 	res	= struct;
 	
-	data	= load(strPathDC);
+	data	= load(strPathEP);
 	
 	%copy over some info
 		res.param	= data.param;
 	
-	cDirection	= {'forward';'backward'};
-	nDirection	= numel(cDirection);
+	cType	= {'instantaneous';'window'};
+	nType	= numel(cType);
 	
-	[nSrc,nDst,nTrial,nStart,nLag]	= size(data.(cDirection{1}));
+	[nFeature,nTrial,nStart]	= size(data.(cType{1}));
 	
 	kTarget	= data.label;
 	%new chunking scheme (2015-06-03)

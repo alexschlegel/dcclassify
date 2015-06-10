@@ -81,7 +81,7 @@ function EPatternOne(strPathPP,strPathOut,param)
 		rate		= data.fsample;
 		cElectrode	= data.label;
 		
-		dc.label	= data.trialinfo(:,2);
+		ep.label	= data.trialinfo(:,2);
 		
 		%permute the data to nSample x nTrial x nElectrode
 			data	= permute(cat(3,data.trial{:}),[2 3 1]);
@@ -94,7 +94,7 @@ function EPatternOne(strPathPP,strPathOut,param)
 		nFeature	= size(data,3);
 	
 	%number of samples and trials
-		nTrial	= numel(dc.label);
+		nTrial	= numel(ep.label);
 	
 	%window start info
 		t	= param.(param.type).t;

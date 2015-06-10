@@ -76,7 +76,7 @@ function res= DCClassifyOne(strPathDC,param)
 	global strDirAnalysis;
 	
 	strSession	= PathGetSession(strPathDC);
-	strPathOut	= PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('%s-%s',strSession,param.type),'mat');
+	strPathOut	= PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('dcclassify-%s-%s',strSession,param.type),'mat');
 	
 	if ~param.force_pre && FileExists(strPathOut)
 		res	= MATLoad(strPathOut,'res');
