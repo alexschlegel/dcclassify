@@ -1,5 +1,5 @@
 function res = ElectrodeClassify(cPathEP,varargin)
-% Donchin.DCClassify
+% Donchin.ElectrodeClassify
 % 
 % Description:	perform classification on the electrode patterns constructed by
 %				Donchin.ConstructElectrodePatterns
@@ -51,7 +51,7 @@ global strDirAnalysis
 		param	= rmfield(opt,{'output','force','isoptstruct','opt_extra'});
 		
 		%do each subject's classification
-			res	= cellfunprogress(@(f) ElectrodeClassifyOne(f,param),cPathDC,...
+			res	= cellfunprogress(@(f) ElectrodeClassifyOne(f,param),cPathEP,...
 					'label'	, 'performing Electrode classification'	 ...
 					);
 			
