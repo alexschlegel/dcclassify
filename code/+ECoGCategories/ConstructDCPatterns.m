@@ -30,7 +30,7 @@ global strDirData;
 
 %do we need to construct the DC patterns?
 	if ~opt.force && FileExists(strPathDC)
-		sDC	= MATLoad(strPathPP,'s');
+		sDC	= MATLoad(strPathDC,'s');
 		
 		return;
 	end

@@ -51,13 +51,19 @@ function res = RSA(sDC,varargin)
 	for kD=1:nDirection
 		res.(cDirection{kD})	= NaN(nCategory,nCategory,nStart,nLag);
 		
+		dc					= sDC.(cDirection{kD});
+		[nSrc,nDst,~,~,~]	= size(dc);
+		dc					= reshape(dc,nSrc*nDst,nTrial,nStart,nLag);
+		
 		progress('action','init','name','start','total',nStart,'label','start times');
 		for kS=1:nStart
 			for kL=1:nLag
-				dcMean	= cellfun(@(c) reshape(mean(sDC.(cDirection{kD})(:,:,strcmp(sDC.label,c),kS,kL),3),1,[]),res.param.category,'uni',false);
+				dcCur	= zscore(dc(:,:,kS,kL),[],2);
+				
+				dcMean	= cellfun(@(c) reshape(mean(dcCur(:,strcmp(sDC.label,c)),2),1,[]),res.param.category,'uni',false);
 				dcMean	= cat(1,dcMean{:});
 				
-				res.(cDirection{kD})(:,:,kS,kL)	= squareform(pdist(dcMean));
+				res.(cDirection{kD})(:,:,kS,kL)	= squareform(pdist(dcMean,'correlation'));
 			end
 			
 			progress('name','start');
