@@ -1,47 +1,50 @@
-function res = DCClassify(cPathDC,varargin)
-% Donchin.DCClassify
+function res = DCAnova(cPathPP,varargin)
+% Donchin.DCAnova
 % 
-% Description:	perform classification on the DC patterns constructed by
-%				Donchin.ConstructDCPatterns
+% Description:	test whether directed connectivity differs between the four
+%				task conditions
 % 
-% Syntax:	res = Donchin.DCClassify(cPathDC,<options>)
+% Syntax:	res = Donchin.DCAnova(cPathPP,<options>)
 % 
 % In:
-%	cPathDC	- a cell of paths to the DC patterns construct by
-%			  Donchin.ConstructDCPatterns
+%	cPathPP	- a cell of paths to the preprocessed EEG data .mat files (see
+%			  Donchin.PreprocessData)
 %	<options>:
-%		type:		(<required>) the classification type:
-%						'compute':	for compute +/- classification
-%						'task':		for classification between all 4 tasks
-%									during preparatory period
-%						'task2':	for classification between all 4 tasks
-%									during preparatory period, with expanded
-%									window
-%		output:		(<auto>) the output result file path
-%		cores:		(1) the number of cores to use
-%		force:		(true) true to force dc classification
-%		force_pre:	(<force>) true to force the individual subject
-%					cross-validations
+%		type:	(<required>) the classification type:
+%					'compute':	for compute +/-
+%					'task':		for comparison between all 4 tasks during
+%								preparatory period
+%					'task2':	for comparison between all 4 tasks during
+%								preparatory period, with expanded window
+%		output:	(<auto>) the output result file path
+%		param:	(<load>) the donchin parameters from Donchin.GetParameters
+%		cores:	(1) the number of cores to use
+%		force:	(true) true to force processing if output results already exist
 % 
-% Updated: 2015-06-08
+% Updated: 2015-06-12
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
-global strDirAnalysis
 
 %parse the inputs
 	opt	= ParseArgs(varargin,...
 			'type'		, ''	, ...
-			'output'	, []	, ...
+			'param'		, []	, ...
 			'cores'		, 1		, ...
-			'force'		, true	, ...
-			'force_pre'	, []	  ...
+			'force'		, true	  ...
 			);
 	
-	opt.force_pre	= unless(opt.force_pre,opt.force);
-	
-	strPathOut	= unless(opt.output,PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('dcclassify_%s',opt.type),'mat'));
+	strPathOut	= unless(opt.output,PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('dcanova_%s',opt.type),'mat'));
 	CreateDirPath(PathGetDir(strPathOut));
+	
+	%parameters
+		if isempty(opt.param)
+			param	= Donchin.GetParameters;
+		else
+			param	= opt.param;
+		end
+		
+		param.type	= opt.type;
 
 %do we need to perform the analysis?
 	bDo	= opt.force || ~FileExists(strPathOut);
@@ -51,8 +54,8 @@ global strDirAnalysis
 		param	= rmfield(opt,{'output','force','isoptstruct','opt_extra'});
 		
 		%do each subject's classification
-			res	= cellfunprogress(@(f) DCClassifyOne(f,param),cPathDC,...
-					'label'	, 'performing DC classification'	 ...
+			res	= cellfunprogress(@(f) DCAnovaOne(f,param),cPathDC,...
+					'label'	, 'performing DC comparison'	 ...
 					);
 			
 		res	= restruct(res);
@@ -72,7 +75,7 @@ global strDirAnalysis
 	end
 
 %------------------------------------------------------------------------------%
-function res= DCClassifyOne(strPathDC,param)
+function res= DCAnovaOne(strPathDC,param)
 	global strDirAnalysis;
 	
 	strSession	= PathGetSession(strPathDC);
