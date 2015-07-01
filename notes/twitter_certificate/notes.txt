@@ -1,0 +1,3 @@
+to get MATLAB to be able to use the twitter API:
+
+sudo keytool -importcert -file ~/temp/api.twitter.com -keystore ~/MATLAB/sys/java/jre/glnxa64/jre/lib/security/cacerts
