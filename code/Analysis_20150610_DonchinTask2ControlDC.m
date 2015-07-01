@@ -31,7 +31,23 @@ strExperiment	= 'donchin';
 					);
 
 %construct the control DCs
-	cPathDC	= Donchin.ConstructDCControl(cPathPP,...
+	switch computername
+		case 'ebbinghaus'
+			kPath	= 1:3;
+		case 'ramonycajal'
+			kPath	= 4:6;
+		case 'wertheimer'
+			kPath	= 7:numel(cPathPP);
+		otherwise
+			warning('unknown computer');
+			kPath	= 1:numel(cPathPP);
+	end
+	
+	status(sprintf('%s processing %s',computername,join(kPath,',')));
+	
+	cPathPPSub	= cPathPP(kPath);
+	
+	cPathDC	= Donchin.ConstructDCControl(cPathPPSub,...
 				'type'	, 'task2'	, ... 
 				'param'	, param		, ...
 				'cores'	, nCore		, ...
@@ -39,7 +55,7 @@ strExperiment	= 'donchin';
 				);
 
 %test the DCs
-	res	= Donchin.DCAnova(cPathPP,...
+	res	= Donchin.DCAnova(cPathDC,...
 				'type'	, 'task2'	, ... 
 				'param'	, param		, ...
 				'cores'	, nCore		, ...
