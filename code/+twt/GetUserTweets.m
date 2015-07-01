@@ -73,6 +73,11 @@ function [tweet,nextTweetID] = GetTweetsBeforeID(tweet_id)
 	
 	response	= tw.userTimeline('user_id',id,prm{:},'count',200,'exclude_replies',0,'include_rts',1);
 	
+	if numel(response)==1 && numel(response{1})>1
+	%why is this happening?
+		response	= num2cell(response{1});
+	end
+	
 	if ~isempty(response)
 		response	= reshape(response,[],1);
 		
