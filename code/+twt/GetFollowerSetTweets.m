@@ -32,8 +32,9 @@ function tweet = GetFollowerSetTweets(tw,kCandidate,varargin)
 
 %get the data
 	follower	= twt.GetFollowerSet(tw,kCandidate,'allbut',opt.allbut);
+	nFollower	= numel(follower);
 	
-	strCache	= sprintf('%s_cache',strHash);
+	strCache	= sprintf('%d_cache',strHash);
 	
 	tweet	= cellfunprogress(@(id) twt.GetUserTweets(tw,id,'cache',strCache),num2cell(follower.id),...
 				'label'	, 'retrieving follower set tweets'	, ...
