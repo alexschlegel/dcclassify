@@ -36,6 +36,10 @@ function follower = GetFollowerSet(tw,kCandidate,varargin)
 	id	= intersectmulti(id,'allbut',opt.allbut);
 %get info for each user
 	follower	= twt.GetUserInfo(tw,id);
+%remove protected accounts
+	follower	= restruct(follower);
+	follower	= follower([follower.protected]==0);
+	follower	= restruct(follower);
 
 %save it
 	twt.SaveData(follower,'followerset',strHash);

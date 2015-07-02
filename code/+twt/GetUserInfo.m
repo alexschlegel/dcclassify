@@ -8,7 +8,7 @@ function s = GetUserInfo(tw,user)
 % In:
 % 	user	- an array of user ids
 % 
-% Updated: 2015-06-30
+% Updated: 2015-07-01
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -20,7 +20,7 @@ nUser	= numel(user);
 s	= cell(nUser,1);
 
 nPer	= 100;
-progress('action','init','total',nUser,'step',nPer);
+progress('action','init','total',nUser,'step',nPer,'label','retrieving user info');
 for kU=1:nPer:nUser
 	kUCur	= kU:min(kU+nPer-1,nUser);
 	
@@ -54,9 +54,10 @@ function cInfo = DoGet(id)
 					'num_status'	, r.statuses_count		, ...
 					'num_follower'	, r.followers_count		, ...
 					'num_friends'	, r.friends_count		, ...
-					'language'		, r.lang				  ...
+					'language'		, r.lang				, ...
+					'protected'		, r.protected			  ...
 					),response(kReturn(b)),'uni',false);
-	cInfo(~b)	= {struct('id',NaN,'user','','name','','location','','num_status',NaN,'num_follower',NaN,'num_friends',NaN,'language','')};
+	cInfo(~b)	= {struct('id',NaN,'user','','name','','location','','num_status',NaN,'num_follower',NaN,'num_friends',NaN,'language','','protected',NaN)};
 	
 	nRemain	= nRemain - 1;
 end

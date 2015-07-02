@@ -1,9 +1,9 @@
-function strPathData = GetPathData(strDataType)
+function strPathData = GetPathData(strDataType,name)
 % twt.GetPathData
 % 
 % Description:	get the path to a data file
 % 
-% Syntax:	strPathData = twt.GetPathData(strDataType)
+% Syntax:	strPathData = twt.GetPathData(strDataType,name)
 %
 % Updated: 2015-06-30
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
@@ -11,5 +11,10 @@ function strPathData = GetPathData(strDataType)
 % License.
 global strDirData;
 
-strDirTwitter	= DirAppend(strDirData,'twitter');
-strPathData		= PathUnsplit(strDirTwitter,sprintf('data-%s',strDataType),'mat');
+strDirOut	= DirAppend(strDirData,'twitter',strDataType);
+
+if ~isdir(strDirOut)
+	mkdir(strDirOut);
+end
+
+strPathData		= PathUnsplit(strDirOut,tostring(name),'mat');

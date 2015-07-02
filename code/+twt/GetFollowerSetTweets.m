@@ -32,7 +32,6 @@ function tweet = GetFollowerSetTweets(tw,kCandidate,varargin)
 
 %get the data
 	follower	= twt.GetFollowerSet(tw,kCandidate,'allbut',opt.allbut);
-	nFollower	= numel(follower);
 	
 	strCache	= sprintf('%d_cache',strHash);
 	
