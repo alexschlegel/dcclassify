@@ -6,12 +6,17 @@ function s = GetUserInfo(tw,user)
 % Syntax:	s = twt.GetUserFollowers(tw,user)
 %
 % In:
-% 	user	- an array of user ids
+% 	user	- an array of user ids or a cell array of screen names
 % 
 % Updated: 2015-07-01
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
+
+if ischar(user)
+	user	= {user};
+end
+
 nUser	= numel(user);
 
 %wait until we can get this resource
@@ -39,11 +44,25 @@ function cInfo = DoGet(id)
 		nRemain	= WaitForResource;
 	end
 	
-	response	= reshape(tw.usersLookup('user_id',num2cell(id)),[],1);
+	if iscell(id)
+		cID			= id;
+		userType	= 'screen_name';
+	else
+		cID			= num2cell(id);
+		userType	= 'user_id';
+	end
+	
+	response	= reshape(tw.usersLookup(userType,cID),[],1);
 	
 	%match with the input ids and add blanks for null results
-		idReturn	= cellfun(@(x) x.id,response);
-		[b,kReturn]	= ismember(id,idReturn);
+		switch userType
+			case 'screen_name'
+				userReturn	= cellfun(@(x) x.screen_name,response,'uni',false);
+				[b,kReturn]	= ismember(cID,userReturn);
+			case 'user_id'
+				idReturn	= cellfun(@(x) x.id,response);
+				[b,kReturn]	= ismember(id,idReturn);
+		end
 	
 	cInfo		= cell(n,1);
 	cInfo(b)	= cellfun(@(r) struct(...

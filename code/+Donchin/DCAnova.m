@@ -21,7 +21,7 @@ function res = DCAnova(cPathDC,varargin)
 %		cores:		(1) the number of cores to use
 %		force:		(true) true to force dc comparison
 % 
-% Updated: 2015-06-15
+% Updated: 2015-07-15
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -34,8 +34,6 @@ global strDirAnalysis
 			'cores'		, 1		, ...
 			'force'		, true	  ...
 			);
-	
-	opt.force_pre	= unless(opt.force_pre,opt.force);
 	
 	strPathOut	= unless(opt.output,PathUnsplit(DirAppend(strDirAnalysis,'donchin'),sprintf('dcanova_%s',opt.type),'mat'));
 	CreateDirPath(PathGetDir(strPathOut));

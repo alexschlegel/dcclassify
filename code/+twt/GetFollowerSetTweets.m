@@ -41,4 +41,4 @@ function tweet = GetFollowerSetTweets(tw,kCandidate,varargin)
 				);
 
 %save it
-	twt.SaveData(tweet,'followers',strHash);
+	twt.SaveData(tweet,'followersettweets',strHash);

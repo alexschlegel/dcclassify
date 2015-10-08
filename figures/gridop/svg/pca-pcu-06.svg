@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?><!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg preserveAspectRatio="xMinYMin meet" width="100%" height="100%" viewBox="0 0 1350.000 200.000"  version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <desc>Matlab Figure Converted by PLOT2SVG written by Juerg Schwizer</desc>
+  <g id="topgroup">
+  <rect x="0" y="0" width="1350.000" height="200.000" fill="#ffffff" stroke="none" />
+  <g id ="ID000000">
+  <clipPath id="ID000001">
+    <rect x="13.500" y="0.000" width="1336.500" height="200.000"/>
+  </clipPath>
+      <polygon fill="#ffffff" fill-opacity="1.00" stroke="none" stroke-width="1.5pt" stroke-opacity="1.00" stroke-dasharray="none" points="13.500,200.000 1350.000,200.000 1350.000,0.000 13.500,0.000 "/>
+      <polygon fill="#ffffff" fill-opacity="1.00" stroke="none" stroke-width="1.5pt" stroke-opacity="1.00" stroke-dasharray="none" points="13.500,0.000 1350.000,0.000 1350.000,0.000 13.500,0.000 "/>
+      <polygon fill="#ffffff" fill-opacity="1.00" stroke="none" stroke-width="1.5pt" stroke-opacity="1.00" stroke-dasharray="none" points="13.500,200.000 13.500,200.000 13.500,0.000 13.500,0.000 "/>
+    <g>
+<g id="ID000002" clip-path="url(#ID000001)" >
+      <polyline fill="none" stroke="#e09000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,32.371 21.699,19.059 29.899,10.507 38.098,39.607 46.298,73.479 54.497,81.436 62.696,45.786 70.896,68.078 79.095,111.825 87.294,119.109 95.494,94.514 103.693,74.713 111.893,92.246 120.092,181.507 128.291,181.692 136.491,200.000 144.690,147.928 152.890,139.606 161.089,137.528 169.288,149.818 177.488,107.418 185.687,85.805 193.887,110.425 202.086,100.130 210.285,36.455 218.485,13.070 226.684,0.000 234.883,92.635 243.083,193.948 251.282,141.014 259.482,103.863 267.681,120.220 275.880,135.306 284.080,102.561 292.279,114.433 300.479,81.737 308.678,101.004 316.877,66.000 325.077,58.101 333.276,74.146 341.475,103.492 349.675,139.419 357.874,90.141 366.074,80.850 374.273,131.747 382.472,120.515 390.672,59.437 398.871,54.452 407.071,120.505 415.270,152.528 423.469,138.256 431.669,38.936 439.868,51.739 448.067,41.956 456.267,44.788 464.466,43.671 472.666,41.145 480.865,24.829 489.064,53.701 497.264,143.801 505.463,190.557 513.663,126.469 521.862,104.531 530.061,131.178 538.261,92.791 546.460,87.630 554.660,28.343 562.859,46.589 571.058,51.111 579.258,37.475 587.457,56.540 595.656,81.707 603.856,76.219 612.055,67.487 620.255,77.222 628.454,79.684 636.653,85.637 644.853,53.160 653.052,72.420 661.252,91.108 669.451,110.938 677.650,103.567 685.850,92.365 694.049,52.263 702.248,23.216 710.448,115.723 718.647,131.914 726.847,96.332 735.046,52.455 743.245,68.931 751.445,71.343 759.644,40.527 767.844,103.069 776.043,150.663 784.242,18.155 792.442,33.034 800.641,42.761 808.840,0.000 817.040,76.196 825.239,131.606 833.439,113.057 841.638,17.406 849.837,59.164 858.037,90.807 866.236,69.745 874.436,40.708 882.635,39.827 890.834,41.165 899.034,53.876 907.233,103.371 915.433,139.678 923.632,174.667 931.831,151.370 940.031,177.869 948.230,171.358 956.429,200.000 964.629,183.166 972.828,122.707 981.028,97.163 989.227,138.956 997.426,141.957 1005.626,91.480 1013.825,74.964 1022.025,81.973 1030.224,67.784 1038.423,119.878 1046.623,142.445 1054.822,105.618 1063.021,94.504 1071.221,114.383 1079.420,102.132 1087.620,75.689 1095.819,125.069 1104.018,142.294 1112.218,93.393 1120.417,68.155 1128.617,52.444 1136.816,11.635 1145.015,9.993 1153.215,62.257 1161.414,80.600 1169.613,116.788 1177.813,120.753 1186.012,159.070 1194.212,111.360 1202.411,101.624 1210.610,90.090 1218.810,79.984 1227.009,73.635 1235.209,66.315 1243.408,78.258 1251.607,99.565 1259.807,83.602 1268.006,101.090 1276.206,78.356 1284.405,70.633 1292.604,47.159 1300.804,33.281 1309.003,86.490 1317.202,102.557 1325.402,131.723 1333.601,98.212 1341.801,136.056 1350.000,158.637 "/>
+<g>
+</g>
+</g>
+<g id="ID000003" >
+</g>
+<g id="ID000004" >
+</g>
+<g id="ID000005" >
+</g>
+<g id="ID000006" >
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,0.000 "/>
+<g>
+</g>
+</g>
+<g id="ID000007" >
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,100.000 1350.000,100.000 "/>
+<g>
+</g>
+</g>
+    </g>
+    <g>
+      <polyline fill="none" stroke="#ffffff" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,186.635 "/>
+      <polyline fill="none" stroke="#ffffff" stroke-width="1.5pt" stroke-dasharray="none" points="825.239,200.000 825.239,186.635 "/>
+      <polyline fill="none" stroke="#ffffff" stroke-width="1.5pt" stroke-dasharray="none" points="1350.000,200.000 1350.000,186.635 "/>
+      <polyline fill="none" stroke="#ffffff" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 1350.000,200.000 "/>
+  <g transform="translate(13.500,215.800)">
+    <g transform="rotate(-0.0)">
+      <text x="0.000" y="0.000" font-family="Helvetica" text-anchor="middle" font-size="10pt" fill="#ffffff" >  1</text>
+    </g>
+  </g>
+  <g transform="translate(825.239,215.800)">
+    <g transform="rotate(-0.0)">
+      <text x="0.000" y="0.000" font-family="Helvetica" text-anchor="middle" font-size="10pt" fill="#ffffff" >100</text>
+    </g>
+  </g>
+  <g transform="translate(1350.000,215.800)">
+    <g transform="rotate(-0.0)">
+      <text x="0.000" y="0.000" font-family="Helvetica" text-anchor="middle" font-size="10pt" fill="#ffffff" >164</text>
+    </g>
+  </g>
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,0.000 "/>
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,198.000 "/>
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,198.000 "/>
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,198.000 "/>
+      <polyline fill="none" stroke="#000000" stroke-width="1.5pt" stroke-dasharray="none" points="13.500,200.000 13.500,200.000 "/>
+    </g>
+  </g>
+  </g>
+</svg>
