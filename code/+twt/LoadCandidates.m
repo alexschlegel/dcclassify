@@ -11,8 +11,9 @@ function s = LoadCandidates(varargin)
 %								false to included only undeclared candidates,
 %								empty to include both
 %		exclude_by_last_name:	([]) a last name/cell of last names to exclude
+%		analysis:				('twitter') the analysis name
 % 
-% Updated: 2015-07-17
+% Updated: 2015-10-12
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -20,11 +21,12 @@ global strDirData
 
 %parse the inputs
 	opt	= ParseArgs(varargin,...
-			'declared'				, []	, ...
-			'exclude_by_last_name'	, []	  ...
+			'declared'				, []		, ...
+			'exclude_by_last_name'	, []		, ...
+			'analysis'				, 'twitter'	  ...
 			);
 
-strDirTwitter	= DirAppend(strDirData,'twitter');
+strDirTwitter	= DirAppend(strDirData,opt.analysis);
 strPathData		= PathUnsplit(strDirTwitter,'candidates','csv');
 
 s	= table2struct(fget(strPathData),'delim','csv');
@@ -43,14 +45,14 @@ nCandidate	= numel(s.name);
 		s.age	= dv(:,1) + dv(:,2)/12;
 
 %load the positions
-	[pos,cPosName]	= twt.LoadCandidatePositions;
+	[pos,cPosName]	= twt.LoadCandidatePositions('analysis',opt.analysis);
 	
 	[~,kPosOrder]	= ismember(s.last_name,cPosName);
 	
 	pos	= structfun2(@(x) x(kPosOrder),pos);
 
 %load the poll results
-	poll	= twt.LoadPolls;
+	poll	= twt.LoadPolls('analysis',opt.analysis);
 
 %exclude by declaration status
 	bKeep	= true(nCandidate,1);

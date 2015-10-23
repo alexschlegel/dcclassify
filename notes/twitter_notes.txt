@@ -4,3 +4,6 @@ http://www.nytimes.com/interactive/2016/us/elections/2016-presidential-candidate
 positions:
 http://selectsmart.com/president/views16.html
 https://public.tableau.com/profile/devjit.chakravarti#!/vizhome/Aconciseguideto2016candidatepositions/CandidateDashboard
+
+polls:
+found at realclearpolitics

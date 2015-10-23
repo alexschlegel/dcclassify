@@ -3,12 +3,12 @@ function s = GetUserInfo(tw,user)
 % 
 % Description:	get info about a set of users
 % 
-% Syntax:	s = twt.GetUserFollowers(tw,user)
+% Syntax:	s = twt.GetUserInfo(tw,user)
 %
 % In:
 % 	user	- an array of user ids or a cell array of screen names
 % 
-% Updated: 2015-07-01
+% Updated: 2015-10-12
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.

@@ -1,8 +1,8 @@
 % Analysis_20150701_Twitter
 % 
-% Description:	
+% Description:	analyze the 2016 republican candidate twitter data
 % 
-% Updated: 2015-07-01
+% Updated: 2015-10-12
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
@@ -82,33 +82,39 @@ param	= twt.Param('declared',true);
 	
 	kTweetCandidate	= cellfun(@(k) kCandidate(k),kTweetUser,'uni',false);
 
-%reduce the space down to the top ~50 most connected followers
-	kkCandidate	= (1:nCandidate)';
+%keep only followers who have replied to at least half of the candidates
+	nCandidatesReplied	= cellfun(@(k) numel(unique(k)),kTweetCandidate);
 	
-	nCandidatesReplied	= cellfun(@(k) sum(ismember(kkCandidate,k)),kTweetCandidate);
+	bRepliedWidely	= nCandidatesReplied >= nCandidate/2;
 	
-	mn		= min(nCandidatesReplied);
-	mx		= max(nCandidatesReplied);
-	nTest	= (mn:mx)';
+	tweet				= structfun2(@(x) x(bRepliedWidely),tweet);
+	follower			= structfun2(@(x) x(bRepliedWidely),follower);
+	kTweetCandidate		= kTweetCandidate(bRepliedWidely);
+	nCandidatesReplied	= nCandidatesReplied(bRepliedWidely);
 	
-	nFollowerTest	= arrayfun(@(n) sum(nCandidatesReplied>=n),nTest);
-	dst				= abs(nFollowerTest - 50);
-	kUse			= find(dst==min(dst));
+	%214 widely replying followers
+	nFollower	= numel(follower.id);
+
+%reduce the space down to the top 50 highest participation followers
+	nTweet	= cellfun(@numel,kTweetCandidate);
 	
-	%must have replied to at least 9 candidates
-	mnCandidatesReplied	= nTest(kUse);
+	pIndex	= nTweet;
 	
-	bThresholdReplied	= nCandidatesReplied>=mnCandidatesReplied;
+	[pIndexS,kSort]	= sort(pIndex,'descend');
 	
-	tweet			= structfun2(@(x) x(bThresholdReplied),tweet);
-	follower		= structfun2(@(x) x(bThresholdReplied),follower);
-	kTweetCandidate	= kTweetCandidate(bThresholdReplied);
+	kHighParticipation	= kSort(1:50);
 	
-	%57 highly replying followers
+	tweet			= structfun2(@(x) x(kHighParticipation),tweet);
+	follower		= structfun2(@(x) x(kHighParticipation),follower);
+	kTweetCandidate	= kTweetCandidate(kHighParticipation);
+	
+	%50 high participation followers
 	nFollower	= numel(follower.id);
 
 %construct the reply patterns
 	%number of replies for each candidate and follower
+		kkCandidate	= (1:nCandidate)';
+		
 		reply	= cellfun(@(k) arrayfun(@(kc) sum(k==kc),kkCandidate),kTweetCandidate,'uni',false);
 		reply	= cat(2,reply{:});
 	
@@ -162,6 +168,36 @@ param	= twt.Param('declared',true);
 					fieldnames(param.candidate.position)
 				];
 	nDist	= numel(cName);
+
+%correlation with twitter DSM
+	r	= NaN(nDist,1);
+	s	= cell(nDist,1);
+	
+	for kD=1:nDist
+		[r(kD),s{kD}] = corrcoef2(D',Dall(kD,:),'type','spearman');
+	end	
+	
+	s	= restruct(s);
+
+%correlation with twitterTop DSM
+	rTop	= NaN(nDist,1);
+	sTop	= cell(nDist,1);
+	
+	for kD=1:nDist
+		[rTop(kD),sTop{kD}] = corrcoef2(Dtop',Dall(kD,:),'type','spearman');
+	end	
+	
+	sTop	= restruct(sTop);
+
+%FDR correct
+	cFDR	= {'position';'poll';'prediction';'geography';'age'};
+	kFDR	= find(ismember(cName,cFDR));
+	
+	s.pfdr				= NaN(size(s.p));
+	[~,s.pfdr(kFDR)]	= fdr(s.p(kFDR),0.05);
+	
+	sTop.pfdr			= NaN(size(sTop.p));
+	[~,sTop.pfdr(kFDR)]	= fdr(sTop.p(kFDR),0.05);
 
 %figures
 	for kD=1:nDist
@@ -223,16 +259,6 @@ param	= twt.Param('declared',true);
 			catch me
 			end
 	end
-
-%correlation with twitter DSM
-	r	= NaN(nDist,1);
-	s	= cell(nDist,1);
-	
-	for kD=1:nDist
-		[r(kD),s{kD}] = corrcoef2(D',Dall(kD,:));
-	end	
-	
-	s	= restruct(s);
 
 %save everything
 	strPathOut	= PathUnsplit(strDirOut,'result','mat');

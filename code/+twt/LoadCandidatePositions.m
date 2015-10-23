@@ -1,17 +1,21 @@
-function [s,cName] = LoadCandidatePositions()
+function [s,cName] = LoadCandidatePositions(varargin)
 % twt.LoadCandidatePositions
 % 
 % Description:	load the candidate position information
 % 
-% Syntax:	[s,cName] = twt.LoadCandidatePositions()
+% Syntax:	[s,cName] = twt.LoadCandidatePositions(<options>)
 %
-% Updated: 2015-07-09
+% Updated: 2015-10-12
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
 global strDirData
 
-strDirTwitter	= DirAppend(strDirData,'twitter');
+opt	= ParseArgs(varargin,...
+		'analysis'	, 'twitter'	  ...
+		);
+
+strDirTwitter	= DirAppend(strDirData,opt.analysis);
 strPathData		= PathUnsplit(strDirTwitter,'positions','xls');
 
 [n,str,raw]	= xlsread(strPathData);

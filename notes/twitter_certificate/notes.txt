@@ -1,6 +1,7 @@
 to get MATLAB to be able to use the twitter API:
 
 sudo keytool -importcert -file ~/studies/dcclassify/notes/twitter_certificate/api.twitter.com -keystore ~/MATLAB/sys/java/jre/glnxa64/jre/lib/security/cacerts
+OR
 sudo keytool -importcert -file ~/studies/dcclassify/notes/twitter_certificate/api.twitter.com -keystore ~/matlab/sys/java/jre/glnxa64/jre/lib/security/cacerts
 
 password is changeit

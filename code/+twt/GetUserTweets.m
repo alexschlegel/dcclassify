@@ -9,23 +9,30 @@ function tweet = GetUserTweets(tw,id,varargin)
 % 	tw	- the twitty object
 % 	id	- the user id
 % 	<options>:
-% 		cache:	(<none>) the name of the data cache to check for existing tweets
+%		earliest:	(0) the timestamp of the earliest tweet to return
+%		latest:		(<nowmsUTC>) the timestamp of the latest tweet to return
+% 		cache:		(<none>) the name of the data cache to check for existing
+%					tweets
+%		analysis:	('twitter') the analysis data to use
 % 
-% Updated: 2015-07-01
+% Updated: 2015-10-15
 % Copyright 2015 Alex Schlegel (schlegel@gmail.com).  This work is licensed
 % under a Creative Commons Attribution-NonCommercial-ShareAlike 3.0 Unported
 % License.
 
 %parse the inputs
 	opt	= ParseArgs(varargin,...
-			'cache'	, []	  ...
+			'earliest'	, 0			, ...
+			'latest'	, nowmsUTC	, ...
+			'cache'		, []		, ...
+			'analysis'	, 'twitter'	  ...
 			);
 	
 	bUseCache	= ~isempty(opt.cache);
 
 %do we need to get the tweets?
-	if bUseCache && twt.DataExist(opt.cache,id)
-		tweet	= twt.LoadData(opt.cache,id);
+	if bUseCache && twt.DataExist(opt.cache,id,'analysis',opt.analysis)
+		tweet	= twt.LoadData(opt.cache,id,'analysis',opt.analysis);
 		return;
 	end
 
@@ -54,7 +61,7 @@ fprintf('\n');
 tweet	= restruct(reshape(tweet,[],1));
 
 if bUseCache
-	twt.SaveData(tweet,opt.cache,id);
+	twt.SaveData(tweet,opt.cache,id,'analysis',opt.analysis);
 end
 
 %------------------------------------------------------------------------------%
@@ -71,7 +78,32 @@ function [tweet,nextTweetID] = GetTweetsBeforeID(tweet_id)
 		prm	= {};
 	end
 	
-	response	= tw.userTimeline('user_id',id,prm{:},'count',200,'exclude_replies',0,'include_rts',1);
+	try
+		response	= tw.userTimeline('user_id',id,prm{:},'count',200,'exclude_replies',0,'include_rts',1);
+	catch me
+		%maybe the user became protected after we got the user info
+		if strfind(me.message,'response code: 401')
+			try
+				user	= twt.GetUserInfo(tw,id);
+			catch me
+				%maybe user was deleted
+				tweet		= {};
+				nextTweetID	= '0';
+				return;
+			end
+			
+			if user.protected
+				%yep
+				tweet		= {};
+				nextTweetID	= '0';
+				return;
+			else
+				rethrow(me);
+			end
+		else
+			rethrow(me);
+		end
+	end
 	
 	if numel(response)==1 && numel(response{1})>1
 	%why is this happening?
@@ -90,8 +122,16 @@ function [tweet,nextTweetID] = GetTweetsBeforeID(tweet_id)
 					'is_quote_status'		, r.is_quote_status											  ...
 					),response,'uni',false);
 		
-					
-		nextTweetID	= num2str(min(cellfun(@(t) t.id,tweet)));
+		%keep only tweets within the specified time period
+			tTweet		= cellfun(@(t) t.time,tweet);
+			bTweetValid	= tTweet>=opt.earliest & tTweet<=opt.latest;
+			tweet		= tweet(bTweetValid);
+		
+		if ~isempty(tweet)
+			nextTweetID	= num2str(min(cellfun(@(t) t.id,tweet)));
+		else
+			nextTweetID	= '0';
+		end
 	else
 		tweet		= {};
 		nextTweetID	= '0';

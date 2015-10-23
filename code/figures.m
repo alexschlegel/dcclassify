@@ -27,17 +27,24 @@ strDirOut	= DirAppend(strDirBase,'figures');
 		strPathOut	= PathUnsplit(strDirFig,sprintf('pat_%02d',kP),'bmp');
 		imwrite(pat(:,kP),strPathOut);
 	end
-	
+
 %values for fmri connectivity results
 	confM	= [4 2 1 1; 2 4 1 1; 1 1 4 2; 1 1 2 4];
 	
 	%all 80 data sets are included, first 40 are the first session
 		strPathResult	= '/home/alex/studies/mwlearn/analysis/20150320_roidcmvpa/result.mat';
+		
 		res				= MATLoad(strPathResult,'res');
-	
-	%just take the first session
-		confS	= res.shape.result.allway.confusion(:,:,:,1:40);
-		confO	= res.operation.result.allway.confusion(:,:,:,1:40);
+		
+		
+	%just take one session's data
+		%session 1
+			kData	= 1:40;
+		%session 2
+			%kData	= 41:80;
+			
+		confS	= res.shape.result.allway.confusion(:,:,:,kData);
+		confO	= res.operation.result.allway.confusion(:,:,:,kData);
 		
 		sz		= num2cell(size(confS));
 	%correlations
@@ -61,14 +68,18 @@ strDirOut	= DirAppend(strDirBase,'figures');
 		ptMin	= 1;
 		ptMax	= 8;
 		
-		tMin	= min([tstatS.tstat(hS); tstatO.tstat(hO)]);
-		tMax	= max([tstatS.tstat(hS); tstatO.tstat(hO)]);
+		%for session 1
+			tMin	= min([tstatS.tstat(hS); tstatO.tstat(hO)]);
+			tMax	= max([tstatS.tstat(hS); tstatO.tstat(hO)]);
+		%for session 2, use session 1's values
+			%tMin	= 1.743;
+			%tMax	= 6.217;
 		
 		disp('shape');
-		disp([res.shape.mask(hS,:) num2cell(hfdrS(hS)) num2cell(tstatS.tstat(hS)) num2cell(MapValue(tstatS.tstat(hS),tMin,tMax,ptMin,ptMax))]);
+		disp([res.shape.mask(hS,:) num2cell(hfdrS(hS)) num2cell(tstatS.tstat(hS)) num2cell(MapValue(tstatS.tstat(hS),tMin,tMax,ptMin,ptMax,'constrain',false))]);
 		
 		disp('operation');
-		disp([res.shape.mask(hO,:) num2cell(hfdrO(hO)) num2cell(tstatO.tstat(hO)) num2cell(MapValue(tstatO.tstat(hO),tMin,tMax,ptMin,ptMax))]);
+		disp([res.shape.mask(hO,:) num2cell(hfdrO(hO)) num2cell(tstatO.tstat(hO)) num2cell(MapValue(tstatO.tstat(hO),tMin,tMax,ptMin,ptMax,'constrain',false))]);
 
 %donchin figures
 	strDirFig	= DirAppend(strDirOut,'donchin');
