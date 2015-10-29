@@ -16,7 +16,8 @@ CreateDirPath(strDirOut);
 	nFigure	= numel(h);
 
 %extract the plot data
-	colOI	= [0.75 0 1];
+	%the color of the plot to extract
+		colOI	= [0.75 0 1]; %the purple one
 	
 	[cVarName,cX,cY,cErr]	= deal(cell(nFigure,1));
 	

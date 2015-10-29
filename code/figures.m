@@ -29,57 +29,134 @@ strDirOut	= DirAppend(strDirBase,'figures');
 	end
 
 %values for fmri connectivity results
+	strDirFig	= DirAppend(strDirOut,'gridop');
+	
 	confM	= [4 2 1 1; 2 4 1 1; 1 1 4 2; 1 1 2 4];
+	
+	ptMin	= 1;
+	ptMax	= 8;
 	
 	%all 80 data sets are included, first 40 are the first session
 		strPathResult	= '/home/alex/studies/mwlearn/analysis/20150320_roidcmvpa/result.mat';
-		
 		res				= MATLoad(strPathResult,'res');
 		
+		cKData		=	{
+							1:40
+							41:80
+						};
+		nSession	= numel(cKData);
 		
-	%just take one session's data
-		%session 1
-			kData	= 1:40;
-		%session 2
-			%kData	= 41:80;
+	%analyze each session
+		for kS=1:nSession
+			kData	= cKData{kS};
 			
-		confS	= res.shape.result.allway.confusion(:,:,:,kData);
-		confO	= res.operation.result.allway.confusion(:,:,:,kData);
-		
-		sz		= num2cell(size(confS));
-	%correlations
-		[rS,statS]	= corrcoef2(reshape(confM,[],1),permute(reshape(confS,[],sz{3:4}),[2 3 1]));
-		[rO,statO]	= corrcoef2(reshape(confM,[],1),permute(reshape(confO,[],sz{3:4}),[2 3 1]));
-	%t-test comparing correlations to 0
-		[hS,pS,ciS,tstatS]	= ttest(statS.z,0,0.05,'right',2);
-		hS					= logical(hS);
-		
-		[hO,pO,ciO,tstatO]	= ttest(statO.z,0,0.05,'right',2);
-		hO					= logical(hO);
+			confS	= res.shape.result.allway.confusion(:,:,:,kData);
+			confO	= res.operation.result.allway.confusion(:,:,:,kData);
+			sz		= num2cell(size(confS));
+			
+			cMaskS	= res.shape.mask;
+			cMaskO	= res.operation.mask;
+			
+			%correlations
+				[rS,statS]	= corrcoef2(reshape(confM,[],1),permute(reshape(confS,[],sz{3:4}),[2 3 1]));
+				[rO,statO]	= corrcoef2(reshape(confM,[],1),permute(reshape(confO,[],sz{3:4}),[2 3 1]));
+			%t-test comparing correlations to 0
+				zS	= statS.z;
+				zO	= statO.z;
+				
+				%~ %keep only the tests that were significant in the first session
+					%~ if kS>1
+						%~ zS	= zS(stat(1).shape.hfdr,:);
+						%~ zO	= zO(stat(1).operation.hfdr,:);
+						%~ 
+						%~ cMaskS	= cMaskS(stat(1).shape.hfdr,:);
+						%~ cMaskO	= cMaskO(stat(1).operation.hfdr,:);
+					%~ end
+				
+				[hS,pS,ciS,tstatS]	= ttest(zS,0,0.05,'right',2);
+				hS					= logical(hS);
+				
+				[hO,pO,ciO,tstatO]	= ttest(zO,0,0.05,'right',2);
+				hO					= logical(hO);
+			
+			%t-extrema
+				if kS==1
+					tMin	= min([tstatS.tstat(hS); tstatO.tstat(hO)]);
+					tMax	= max([tstatS.tstat(hS); tstatO.tstat(hO)]);
+				end
+			
+			%fdr correct
+				[~,pfdrS]	= fdr(pS,0.05);
+				hfdrS		= pfdrS<=0.05;
+				
+				[~,pfdrO]	= fdr(pO,0.05);
+				hfdrO		= pfdrO<=0.05;
+			
+			%compile the results
+				stat(kS).shape.mask		= cMaskS;
+				stat(kS).shape.h		= hS;
+				stat(kS).shape.hfdr		= hfdrS;
+				stat(kS).shape.t		= tstatS.tstat;
+				stat(kS).shape.z		= mean(zS,2);
+				stat(kS).shape.thick	= MapValue(tstatS.tstat,tMin,tMax,ptMin,ptMax,'constrain',false);
+				
+				stat(kS).operation.mask		= cMaskO;
+				stat(kS).operation.h		= hO;
+				stat(kS).operation.hfdr		= hfdrO;
+				stat(kS).operation.t		= tstatO.tstat;
+				stat(kS).operation.z		= mean(zO,2);
+				stat(kS).operation.thick	= MapValue(tstatO.tstat,tMin,tMax,ptMin,ptMax,'constrain',false);
+			
+			%print the results
+				fDisp	= @(s) disp([s.mask(s.h,:) num2cell([s.hfdr(s.h) s.t(s.h) s.thick(s.h)])]);
+				
+				disp(sprintf('session %d',kS));
+				disp('   shape');
+				fDisp(stat(kS).shape);
+				disp('   operation');
+				fDisp(stat(kS).operation);
+		end
 	
-	%fdr correct
-		[~,pfdrS]	= fdr(pS,0.05);
-		hfdrS		= pfdrS<=0.05;
+	%test-retest reliability
+		z1	= [stat(1).shape.z; stat(1).operation.z];
+		z2	= [stat(2).shape.z; stat(2).operation.z];
 		
-		[~,pfdrO]	= fdr(pO,0.05);
-		hfdrO		= pfdrO<=0.05;
-	
-	%print the results
-		ptMin	= 1;
-		ptMax	= 8;
+		nShape		= numel(stat(1).shape.z);
+		nOperation	= numel(stat(1).operation.z);
+		nTotal		= nShape + nOperation;
 		
-		%for session 1
-			tMin	= min([tstatS.tstat(hS); tstatO.tstat(hO)]);
-			tMax	= max([tstatS.tstat(hS); tstatO.tstat(hO)]);
-		%for session 2, use session 1's values
-			%tMin	= 1.743;
-			%tMax	= 6.217;
+		[rTest,sTest]	= corrcoef2(z1,z2');
 		
-		disp('shape');
-		disp([res.shape.mask(hS,:) num2cell(hfdrS(hS)) num2cell(tstatS.tstat(hS)) num2cell(MapValue(tstatS.tstat(hS),tMin,tMax,ptMin,ptMax,'constrain',false))]);
+		xLine	= [min(z1) max(z1)];
+		yLine	= polyval([sTest.m sTest.b],xLine);
 		
-		disp('operation');
-		disp([res.shape.mask(hO,:) num2cell(hfdrO(hO)) num2cell(tstatO.tstat(hO)) num2cell(MapValue(tstatO.tstat(hO),tMin,tMax,ptMin,ptMax,'constrain',false))]);
+		col	= [repmat([1 0 0],[nShape 1]); repmat([0 0.5 1],[nOperation 1]); 0 0 0];
+		
+		cMarker	= [repmat({'.'},[nTotal 1]); 'none'];
+		cLine	= [repmat({'none'},[nTotal 1]); '-'];
+		
+		step	= 0.05;
+		xmin	= floor(min(z1)/step)*step;
+		xmax	= ceil(max(z1)/step)*step;
+		ymin	= floor(min(z2)/step)*step;
+		ymax	= ceil(max(z2)/step)*step;
+		
+		h	= alexplot([num2cell(z1); xLine],[num2cell(z2); yLine],...
+				'xlabel'			, 'Z(r) (1st test)'	, ...
+				'ylabel'			, 'Z(r) (2nd test)'	, ...
+				'xmin'				, xmin				, ...
+				'xmax'				, xmax				, ...
+				'ymin'				, ymin				, ...
+				'ymax'				, ymax				, ...
+				'color'				, col				, ...
+				'marker'			, cMarker			, ...
+				'markersize'		, 25				, ...
+				'linestyle'			, cLine				  ...
+				);
+		
+		strPathOut	= PathUnsplit(strDirFig,'testretest','png');
+		fig2png(h.hF,strPathOut);
+		
 
 %donchin figures
 	strDirFig	= DirAppend(strDirOut,'donchin');
@@ -324,6 +401,8 @@ strDirOut	= DirAppend(strDirBase,'figures');
 		close(h.hF);
 
 %twitter
+	strDirFig	= DirAppend(strDirOut,'twitter');
+	
 	%run the analysis code up through line 108
 	
 	strExample	= 'CarlyFiorina';
@@ -333,6 +412,13 @@ strDirOut	= DirAppend(strDirBase,'figures');
 	kReply		= cellfun(@(id,idStatus) find(id==idExample & idStatus~=0),tweet.in_reply_to_user_id,tweet.in_reply_to_status_id,'uni',false);
 	kReplied	= find(~cellfun(@isempty,kReply));
 	nReplied	= numel(kReplied);
+	
+	%lut
+		[hF,im]	= ShowPalette(str2rgb('default'));
+		close(hF);
+		
+		strPathOut	= PathUnsplit(strDirFig,'lut','png');
+		imwrite(im,strPathOut);
 	
 	%find a good example
 		for kR=1:nReplied
